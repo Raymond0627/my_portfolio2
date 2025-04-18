@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { motion } from "motion/react";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 type SpotlightProps = {
   gradientFirst?: string;
@@ -15,34 +15,46 @@ type SpotlightProps = {
 };
 
 export const Spotlight = ({
-    gradientFirst = "radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsla(240, 100%, 60%, 0.25) 0%, hsla(250, 100%, 45%, 0.2) 50%, hsla(260, 100%, 35%, 0) 80%)",
-    gradientSecond = "radial-gradient(50% 50% at 50% 50%, hsla(250, 100%, 75%, 0.2) 0%, hsla(260, 100%, 50%, 0.15) 80%, transparent 100%)",
-    gradientThird = "radial-gradient(50% 50% at 50% 50%, hsla(240, 100%, 70%, 0.15) 0%, hsla(250, 100%, 40%, 0.1) 80%, transparent 100%)",
-
+  gradientFirst = "radial-gradient(68.54% 68.72% at 55.02% 31.46%, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.1) 50%, rgba(168, 85, 247, 0) 80%)", // Dimmed first gradient
+  gradientSecond = "radial-gradient(50% 50% at 50% 50%, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.05) 80%, transparent 100%)", // Dimmed second gradient
+  gradientThird = "radial-gradient(50% 50% at 50% 50%, rgba(168, 85, 247, 0.05) 0%, rgba(168, 85, 247, 0.02) 80%, transparent 100%)", // Dimmed third gradient
   translateY = -350,
-  width = 560,
+  width = 280,
   height = 1380,
-  smallWidth = 240,
-  duration = 7,
-  xOffset = 100,
-}: SpotlightProps = {}) => {
+  smallWidth = 120,
+  duration = 12,
+  xOffset = 50,
+}: SpotlightProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind's md breakpoint (768px)
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const mobileWidth = width * 0.6;       // 60% size on mobile
+  const mobileSmallWidth = smallWidth * 0.6;
+  const mobileXOffset = xOffset * 0.6;
+
+  const currentWidth = isMobile ? mobileWidth : width;
+  const currentSmallWidth = isMobile ? mobileSmallWidth : smallWidth;
+  const currentXOffset = isMobile ? mobileXOffset : xOffset;
+
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-      }}
-      transition={{
-        duration: 1.5,
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
       className="pointer-events-none absolute inset-0 h-full w-full"
     >
+      {/* Left spotlight */}
       <motion.div
-        animate={{
-          x: [0, xOffset, 0],
-        }}
+        animate={{ x: [0, currentXOffset, 0] }}
         transition={{
           duration,
           repeat: Infinity,
@@ -55,37 +67,34 @@ export const Spotlight = ({
           style={{
             transform: `translateY(${translateY}px) rotate(-45deg)`,
             background: gradientFirst,
-            width: `${width}px`,
+            width: `${currentWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 left-0`}
+          className="absolute top-0 left-0"
         />
-
         <div
           style={{
             transform: "rotate(-45deg) translate(5%, -50%)",
             background: gradientSecond,
-            width: `${smallWidth}px`,
+            width: `${currentSmallWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 left-0 origin-top-left`}
+          className="absolute top-0 left-0 origin-top-left"
         />
-
         <div
           style={{
             transform: "rotate(-45deg) translate(-180%, -70%)",
             background: gradientThird,
-            width: `${smallWidth}px`,
+            width: `${currentSmallWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 left-0 origin-top-left`}
+          className="absolute top-0 left-0 origin-top-left"
         />
       </motion.div>
 
+      {/* Right spotlight */}
       <motion.div
-        animate={{
-          x: [0, -xOffset, 0],
-        }}
+        animate={{ x: [0, -currentXOffset, 0] }}
         transition={{
           duration,
           repeat: Infinity,
@@ -98,30 +107,28 @@ export const Spotlight = ({
           style={{
             transform: `translateY(${translateY}px) rotate(45deg)`,
             background: gradientFirst,
-            width: `${width}px`,
+            width: `${currentWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 right-0`}
+          className="absolute top-0 right-0"
         />
-
         <div
           style={{
             transform: "rotate(45deg) translate(-5%, -50%)",
             background: gradientSecond,
-            width: `${smallWidth}px`,
+            width: `${currentSmallWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 right-0 origin-top-right`}
+          className="absolute top-0 right-0 origin-top-right"
         />
-
         <div
           style={{
             transform: "rotate(45deg) translate(180%, -70%)",
             background: gradientThird,
-            width: `${smallWidth}px`,
+            width: `${currentSmallWidth}px`,
             height: `${height}px`,
           }}
-          className={`absolute top-0 right-0 origin-top-right`}
+          className="absolute top-0 right-0 origin-top-right"
         />
       </motion.div>
     </motion.div>
